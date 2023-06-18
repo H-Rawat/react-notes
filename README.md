@@ -54,3 +54,60 @@ Passing props to children components is called "lifting state up".
     - You can also put the state into some component above their common parent.
     - If you can’t find a component where it makes sense to own the state, create a new component solely for holding the state and add it somewhere in the hierarchy above the common parent component.
 - Add inverse data flow
+
+# DESCRIBING THE UI
+
+- Never nest definitions of components
+- A file can have only one default export but can have multiple named exports
+
+## RULES OF JSX
+
+- Return a single root element because under the hood JSX is transformed into plain JS objects. You can't return two objects from a function without wrapping them into an array.
+- Close all the tags
+- camelCase most of the things because attributes written in JSX become keys of JS objects.
+
+### Specifying a default value for a PROP
+
+```
+function Avatar({person, size = 100}) {
+  // ...
+}
+```
+
+- default value of size is only used if the size prop is missing or if you pass `size={undefined}`
+
+### Conditional Rendering
+
+- Return `null` when you dont want to return anything from a component
+
+- If messageCount is 0, then 0 will be returned from the expression `messageCount && <p>New messages</p>`
+
+### KEYS
+
+- Don't use indexes as keys.
+
+## PURE COMPONENTS
+
+- Pure function
+  - It minds its own business : it doesnt change any obj or variables that existed before it was called.
+  - Same input, same output
+
+Eg :
+
+```
+function double(number) {
+  return 2 * number;
+}
+```
+
+- React uses strict mode to call functions twice to look for any impure functions.
+
+### Side Effects
+
+Side effects happen on the side and not during rendering.
+
+Updating the screen, starting an animation, changing the data are called side effects.
+
+Event handlers dont need to be pure so you can handle side effects inside event handlers.
+
+Side effects can also be handled inside a `useEffect`, but this should be the last resort.
