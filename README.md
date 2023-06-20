@@ -111,3 +111,228 @@ Updating the screen, starting an animation, changing the data are called side ef
 Event handlers dont need to be pure so you can handle side effects inside event handlers.
 
 Side effects can also be handled inside a `useEffect`, but this should be the last resort.
+
+# ADDING INTERACTIVITY
+
+## State: A component's memory
+
+- Local variables dont persist between renders
+- Changes to local variables won't trigger renders
+- To update a component with new data - provided by useState hook
+  - Retain the data between renders
+  - Trigger React to render the component with new data.
+- **You can't call hooks inside conditionals, loops, or other nested functions**
+
+## Render
+
+- Component renders when:
+  - Its the component's initial render
+  - The component's state has been updated
+
+On initial render, React calls the root component.  
+For subsequent renders, React calls the component whos state update triggered the render.
+
+## State as a snapshot
+
+```
+<button onClick={() => {
+        setNumber(number + 1);
+        setNumber(number + 1);
+        setNumber(number + 1);
+      }}>+3</button>
+```
+
+Clicking on this button sets the number to 1 and not 3  
+for the first setState function, number is 0 and then its increased to 1  
+for the second setState function, number is still 0 because the `number` will only change to 1 on re-render and re-render is not triggered until the onClick functione executes completely.  
+So number is always 0 for this snapshot of the state.
+
+**React waits until all code in the event handlers has run before processing your state updates.**
+
+This is whats happening :
+
+```
+<button onClick={() => {
+  setNumber(0 + 1);
+  setNumber(0 + 1);
+  setNumber(0 + 1);
+}}>+3</button>
+```
+
+**If you want to update the state multiple times before re render then use this method:**
+
+`setNumber(n => n + 1)`
+
+- React queues this function to be processed after all the other code in the event handler has run.
+- During the next render, React goes through the queue and gives you the final updated state.
+
+```
+<button onClick={() => {
+  setNumber(number + 5);
+  setNumber(n => n + 1);
+}}>
+```
+
+This will set the state to 6.
+
+## Updating objects in State
+
+`const [position, setPosition] = useState({ x: 0, y: 0 });`
+
+It's possible to change the contents of this object like this : `position.x = 5;`.
+This is called mutation.
+
+But this should be avoided because react will not trigger the re render.
+
+### Objects are not really nested
+
+```
+let obj = {
+  name: 'Niki de Saint Phalle',
+  artwork: {
+    title: 'Blue Nana',
+    city: 'Hamburg',
+    image: 'https://i.imgur.com/Sd1AgUOm.jpg',
+  }
+};
+```
+
+The above object in reality looks like this:
+
+```
+let obj1 = {
+  title: 'Blue Nana',
+  city: 'Hamburg',
+  image: 'https://i.imgur.com/Sd1AgUOm.jpg',
+};
+
+let obj2 = {
+  name: 'Niki de Saint Phalle',
+  artwork: obj1
+};
+```
+
+## Updating arrays in State
+
+- to push any item at the end of an array, similar to push()
+
+```
+setArtists( // Replace the state
+  [ // with a new array
+    ...artists, // that contains all the old items
+    { id: nextId++, name: name } // and one new item at the end
+  ]
+);
+```
+
+- to push any item at the start of an array, similar to unshift()
+
+```
+setArtists([
+  { id: nextId++, name: name },
+  ...artists // Put old items at the end
+]);
+```
+
+- filter can be used to delete an item from an array as it doesnt modify the original array
+
+```
+setArtists(
+  artists.filter(a => a.id !== artist.id)
+);
+```
+
+- transforming an array
+
+```
+const nextShapes = shapes.map(shape => {
+  if (shape.type === 'square') {
+    // No change
+    return shape;
+  } else {
+    // Return a new circle 50px below
+    return {
+      ...shape,
+      y: shape.y + 50,
+    };
+  }
+});
+
+// Re-render with the new array
+setShapes(nextShapes);
+```
+
+- replacing items in an array
+
+```
+const nextCounters = counters.map((c, i) => {
+  if (i === index) {
+    // Increment the clicked counter
+    return c + 1;
+  } else {
+    // The rest haven't changed
+    return c;
+  }
+});
+
+setCounters(nextCounters);
+```
+
+- inserting into an array(not at the start or end)
+
+```
+const insertAt = 1; // Could be any index
+const nextArtists = [
+  // Items before the insertion point:
+  ...artists.slice(0, insertAt),
+  // New item:
+  { id: nextId++, name: name },
+  // Items after the insertion point:
+  ...artists.slice(insertAt)
+];
+
+setArtists(nextArtists);
+setName('');
+```
+
+- reverse() and sort() mutates the original array so you shouldnt use them, instead create a copy of the array and then make changes to it.
+
+```
+const nextList = [...list];
+nextList.reverse();
+setList(nextList);
+```
+
+- here nextList and list points to the same object, so changing nextList also affects list
+
+```
+const nextList = [...list];
+nextList[0].seen = true; // Problem: mutates list[0]
+setList(nextList);
+```
+
+```
+const myList = [
+  { id: 0, title: 'Big Bellies', seen: false },
+  { id: 1, title: 'Lunar Landscape', seen: false },
+  { id: 2, title: 'Terracotta Army', seen: true },
+];
+const myNextList = [...myList];
+const artwork = myNextList.find(a => a.id === artworkId);
+artwork.seen = nextSeen; // Problem: mutates an existing item
+setMyList(myNextList);
+```
+
+here line 3 mutates the original array, instead use map to change the items
+
+```
+setMyList(myList.map(artwork => {
+  if (artwork.id === artworkId) {
+    // Create a *new* object with changes
+    return { ...artwork, seen: nextSeen };
+  } else {
+    // No changes
+    return artwork;
+  }
+}));
+```
