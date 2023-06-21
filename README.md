@@ -336,3 +336,32 @@ setMyList(myList.map(artwork => {
   }
 }));
 ```
+
+# Managing State
+
+## Reacting to input with state
+
+1. Identify your component's different visual states
+
+All the different states user might see:
+
+- Empty: form has a disabled submit btn
+- Typing: enabled submit btn
+- Submitting: form is disabled and spinner is shown
+- Success: Thank you message is shown instead of form
+- Error: same as Typing state, but with an extra error msg
+
+pass the visual state as a `status` prop to the custom component
+
+2. Determine what triggers those state changes
+
+- changing the text input should switch it from 'empty' state to 'typing' state
+- clicking the submit button should switch it to 'submitting' state
+- successful network response should switch it to 'success' state
+- failed network response should switch it to 'error' state
+
+3. Represent the state in memory with `useState`
+
+4. Remove any non essential state variables
+
+5. Connect the event handlers to set state
