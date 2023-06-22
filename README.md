@@ -365,3 +365,53 @@ pass the visual state as a `status` prop to the custom component
 4. Remove any non essential state variables
 
 5. Connect the event handlers to set state
+
+## Choosing the state structure
+
+### **Group related state**
+
+If some two state variables always change together, it might be a good idea to unify them into a single state variable.
+
+`const [position, setPosition] = useState({ x: 0, y: 0 });`
+
+### **Avoid contradictions in state**
+
+If you have 2 states called `isSending` and `isSent`. Since `isSending` and `isSent` should never be `true` at the same time, it is better to replace them with one `status` state variable containing possible states: `typing`, `sending`, and `sent`.
+
+### **Avoid redundant state**
+
+If you can calculate some information from the component's props or its existing state variables during rendering, you should not put that information into that component's state.
+
+Example of redundant state:
+
+```
+function Message({ messageColor }) {
+  const [color, setColor] = useState(messageColor);
+```
+
+The problem is that if parent component passes a different value of `messageColor` later, then `color` state variable would not be updated. The state is only initialized during the first render.
+
+“Mirroring” props into state only makes sense when you want to ignore all updates for a specific prop. By convention, start the prop name with initial or default to clarify that its new values are ignored:
+
+```
+function Message({ initialColor }) {
+  // The `color` state variable holds the *first* value of `initialColor`.
+  // Further changes to the `initialColor` prop are ignored.
+  const [color, setColor] = useState(initialColor);
+```
+
+### **Avoid duplication in state**
+
+The state used to be duplicated like this:
+
+- items = [{ id: 0, title: 'pretzels'}, ...]
+- selectedItem = {id: 0, title: 'pretzels'}
+
+But after the change it’s like this:
+
+- items = [{ id: 0, title: 'pretzels'}, ...]
+- selectedId = 0
+
+### Avoid deeply nested state
+
+You can nest state as much as you like, but making it “flat” can solve numerous problems. It makes state easier to update, and it helps ensure you don’t have duplication in different parts of a nested object.
