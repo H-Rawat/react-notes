@@ -412,6 +412,61 @@ But after the change it’s like this:
 - items = [{ id: 0, title: 'pretzels'}, ...]
 - selectedId = 0
 
-### Avoid deeply nested state
+### **Avoid deeply nested state**
 
 You can nest state as much as you like, but making it “flat” can solve numerous problems. It makes state easier to update, and it helps ensure you don’t have duplication in different parts of a nested object.
+
+# Sharing State between components
+
+1. Remove state from child components
+2. Pass hardcoded data from the common parent.
+3. Add state to the common parent.
+
+## Controlled and Uncontrolled components
+
+A component with some local state is called `uncontrolled`.
+
+A component having information driven by props is called `controlled`.
+
+# Preserving and Resetting state
+
+React preserves a component's state for as long as its being rendered at its position in the UI tree.
+
+```
+{isFancy ? (
+  <Counter isFancy={true} />
+) : (
+  <Counter isFancy={false} />
+)}
+```
+
+whether `isFancy` is true or false, you always have a `<Counter/>`. Its the same component at the same position in the UI tree, thats why the state persists.
+
+**If you want to preserve the state between re-renders, the structure of your tree needs to 'match up' from render to another. If the structure is different, the state gets destroyed because react destroys state when it removes a component from the tree.**
+
+**Always declare component functions at the top level, and dont nest their definitions.**
+
+To reset the state when the position of the components is the same in the UI tree:
+
+1. Rendering a component in different positions
+
+```
+{isPlayerA &&
+  <Counter person="Taylor" />
+}
+{!isPlayerA &&
+  <Counter person="Sarah" />
+}
+```
+
+2. Resetting state with a key: Specifying a key tells React to use the key itself as part of the position, instead of their order within the parent
+
+```
+{isPlayerA ? (
+  <Counter key="Taylor" person="Taylor" />
+) : (
+  <Counter key="Sarah" person="Sarah" />
+)}
+```
+
+**Remember that keys are not globally unique. They only specify the position within the parent.**
