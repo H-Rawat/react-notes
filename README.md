@@ -470,3 +470,79 @@ To reset the state when the position of the components is the same in the UI tre
 ```
 
 **Remember that keys are not globally unique. They only specify the position within the parent.**
+
+# Extracting state logic into a reducer
+
+To reduce this complexity and keep all your logic in one easy-to-access place, you can move that state logic into a single function outside your component, called a “reducer”.
+
+Migrating from `useState` to `useReducer`
+
+1. Move from setting state to dispatching actions
+
+```
+function handleAddTask(text) {
+  setTasks([
+    ...tasks,
+    {
+      id: nextId++,
+      text: text,
+      done: false,
+    },
+  ]);
+}
+```
+
+```
+function handleAddTask(text) {
+  dispatch({
+    type: 'added',
+    id: nextId++,
+    text: text,
+  });
+}
+```
+
+- the object passed to dispatch is called an `action`
+
+2. Write a reducer function
+
+```
+function tasksReducer(tasks, action) {
+  switch (action.type) {
+    case 'added': {
+      return [
+        ...tasks,
+        {
+          id: action.id,
+          text: action.text,
+          done: false,
+        },
+      ];
+    }
+    default: {
+      throw Error('Unknown action: ' + action.type);
+    }
+  }
+}
+```
+
+- `reducer` function is similar to the `reduce` function that's used on the arrays.
+
+3. Use the reducer from your component.
+
+```
+import {useReducer} from 'react';
+const [tasks, dispatch] = useReducer(taskReducer, initialTasks)
+```
+
+# Comparing useState and useReducer
+
+- Code Size: try `useReducer` if there are a lot of event handlers that modify state in a similar way.
+- Readability: if state updates are simple then `useState` is easier to read, otherwise use `useReducer`.
+- Debugging: easier with `useReducer`
+- Testing: Reducer because its a pure function
+
+## Writing reducers well
+
+- reducers should be pure
+- each action should describe a single user interaction
