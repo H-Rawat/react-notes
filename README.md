@@ -610,3 +610,54 @@ export default function Section({ children }) {
 - Current account
 - Routing
 - Managing State
+
+# Scaling up with Reducer and Context
+
+1. Create the context
+
+`TaskContext.js`
+
+```
+import { createContext } from 'react';
+
+export const TasksContext = createContext(null);
+export const TasksDispatchContext = createContext(null);
+```
+
+2. Put state and dispatch into context
+
+```
+import {TasksContext, TasksDispatchContext} from './TaskContext.js';
+
+export default function TaskApp() {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
+
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>
+        ...
+      </TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  )
+}
+```
+
+3. Use context anywhere in the tree
+
+`const tasks = useContext(TasksContext)`
+
+## Moving all wiring into a single file
+
+```
+export function TasksProvider({ children }) {
+  const [tasks, dispatch] = useReducer(tasksReducer, initialTasks);
+
+  return (
+    <TasksContext.Provider value={tasks}>
+      <TasksDispatchContext.Provider value={dispatch}>
+        {children}
+      </TasksDispatchContext.Provider>
+    </TasksContext.Provider>
+  );
+}
+```
