@@ -546,3 +546,67 @@ const [tasks, dispatch] = useReducer(taskReducer, initialTasks)
 
 - reducers should be pure
 - each action should describe a single user interaction
+
+# CONTEXT
+
+1. Create the context
+
+```
+import {createContext} from 'react';
+
+export const LevelContext = createContext(1);
+```
+
+2. Use the context
+
+```
+import { useContext } from 'react';
+import { LevelContext } from './LevelContext.js';
+
+export default function Heading({children}) {
+  const level = useContext(LevelContext);
+}
+```
+
+3. Provide the context
+
+```
+import {LevelContext} from './LevelContext.js';
+
+export default function Section({ level, children }) {
+  return (
+    <section>
+      <LevelContext.Provider value={level}>
+        {children}
+      </LevelContext.Provider>
+    </section>
+  )
+}
+```
+
+## Reading from the component above
+
+```
+import {LevelContext} from './LevelContext.js';
+import { useContext } from './LevelContext.js';
+
+export default function Section({ children }) {
+  const level = useContext(LevelContext);
+  return (
+    <section>
+      <LevelContext.Provider value={level + 1}>
+        {children}
+      </LevelContext.Provider>
+    </section>
+  )
+}
+```
+
+**in React, the only way to override some context coming from above is to wrap children into a context provider with a different value.**
+
+## USE CASES FOR CONTEXT
+
+- Theming
+- Current account
+- Routing
+- Managing State
