@@ -661,3 +661,19 @@ export function TasksProvider({ children }) {
   );
 }
 ```
+
+# Referencing values with Refs
+
+`const ref = useRef(0)`
+
+useRef returns an object like this :
+
+```
+{
+  current: 0
+}
+```
+
+- Refs are retained by React between re-renders.
+- Changing a ref doesnt trigger a re-render.
+- avoid reading the current value during re-rendering
