@@ -1,5 +1,5 @@
 import "./App.css";
-import Stopwatch from "./components/Stopwatch";
+// import Stopwatch from "./components/Stopwatch";
 // import Form from "./components/managing_state/Form";
 // import Products from "./components/thinking_in_react/Products";
 
@@ -8,7 +8,7 @@ function App() {
     <>
       {/* <Products />; */}
       {/* <Form /> */}
-      <Stopwatch />
+      {/* <Stopwatch /> */}
     </>
   );
 }

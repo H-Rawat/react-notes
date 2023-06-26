@@ -677,3 +677,28 @@ useRef returns an object like this :
 - Refs are retained by React between re-renders.
 - Changing a ref doesnt trigger a re-render.
 - avoid reading the current value during re-rendering
+
+# Manipulating the DOM with Refs
+
+`<div ref={myRef}></div>`
+
+## Accessing another component's DOM nodes
+
+- `<MyInput ref={inputRef} />` : tells react to put the corresponding DOM node into `ref.current`. By default, `MyInput` component doesn't let this happen and throws a warning in the console.
+
+- The `MyInput` component is declared using `forwardRef`.
+
+```
+const MyInput = forwardRef({props, ref}) => {
+  return <input {...props} ref={ref} />
+}
+```
+
+## React attaching refs
+
+- during render, react calls your component to figure out what should be on the screen.
+- during commit, react applies changes to the DOM.
+
+React sets `ref.current` during the commit. Before that its `null`.
+
+**Avoid changing DOM nodes managed by React. Modifying, adding children to, or removing children from elements that are managed by React can lead to inconsistent visual results.**
