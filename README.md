@@ -702,3 +702,81 @@ const MyInput = forwardRef({props, ref}) => {
 React sets `ref.current` during the commit. Before that its `null`.
 
 **Avoid changing DOM nodes managed by React. Modifying, adding children to, or removing children from elements that are managed by React can lead to inconsistent visual results.**
+
+# Synchronizing with effects
+
+1. Declare an Effect
+2. Specify the effect dependencies
+3. Add cleanup if needed
+
+## Subscribing to events
+
+```
+useEffect(() => {
+  function handleScroll(e) {
+    console.log(window.scrollX, window.scrollY);
+  }
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+```
+
+If the code subscribes to something then it should also unsubscribe.
+
+## Triggering animations
+
+```
+useEffect(() => {
+  const node = ref.current;
+  node.style.opacity = 1; // Trigger the animation
+  return () => {
+    node.style.opacity = 0; // Reset to the initial value
+  };
+}, []);
+```
+
+## Fetching Data
+
+```
+useEffect(() => {
+  let ignore = false;
+
+  async function startFetching() {
+    const json = await fetchTodos(userId);
+    if (!ignore) {
+      setTodos(json);
+    }
+  }
+
+  startFetching();
+
+  return () => {
+    ignore = true;
+  };
+}, [userId]);
+```
+
+## Sending Analytics
+
+```
+useEffect(() => {
+  logVisit(url); // Sends a POST request
+}, [url]);
+```
+
+Its recommended to keep the code as it is.
+
+## Not an Effect: Initializing the application
+
+```
+if (typeof window !== 'undefined') { // Check if we're running in the browser.
+  checkAuthToken();
+  loadDataFromLocalStorage();
+}
+
+function App() {
+  // ...
+}
+```
+
+Logic that only runs once the application starts can be put outside your components.
